@@ -108,7 +108,8 @@ EC2-Docker-Jenkins/
    ```
 
 2. **Start all services with Docker Compose**
-   ```bash
+   ```bashyes
+   
    docker-compose up -d
    ```
 
