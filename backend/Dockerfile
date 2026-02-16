@@ -6,11 +6,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (production mode)
+RUN npm ci --only=production
 
 # Copy application files
 COPY . .
+
+# Set environment to production
+ENV NODE_ENV=production
 
 # Expose port
 EXPOSE 5000

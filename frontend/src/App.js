@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Login from './components/Login';
+import Register from './components/Register';
 import AccountList from './components/AccountList';
 import AccountForm from './components/AccountForm';
 import TransactionForm from './components/TransactionForm';
 import TransactionList from './components/TransactionList';
-import { accountAPI } from './services/api';
+import { accountAPI, authAPI, setAuthToken } from './services/api';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [showAccountForm, setShowAccountForm] = useState(false);
@@ -15,8 +20,22 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchAccounts();
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      setAuthToken(token);
+      setCurrentUser(JSON.parse(user));
+      setIsAuthenticated(true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchAccounts();
+    }
+  }, [isAuthenticated]);
 
   const fetchAccounts = async () => {
     try {
@@ -30,6 +49,37 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogin = async (credentials) => {
+    const response = await authAPI.login(credentials);
+    const { token, user } = response.data;
+    
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setAuthToken(token);
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+  };
+
+  const handleRegister = async (userData) => {
+    const response = await authAPI.register(userData);
+    const { token, user } = response.data;
+    
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setAuthToken(token);
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setAuthToken(null);
+    setCurrentUser(null);
+    setIsAuthenticated(false);
+    setAccounts([]);
   };
 
   const handleCreateAccount = async (accountData) => {
@@ -98,11 +148,35 @@ function App() {
     setShowTransactionForm(true);
   };
 
+  // If not authenticated, show login or register page
+  if (!isAuthenticated) {
+    return showRegister ? (
+      <Register
+        onRegister={handleRegister}
+        onSwitchToLogin={() => setShowRegister(false)}
+      />
+    ) : (
+      <Login
+        onLogin={handleLogin}
+        onSwitchToRegister={() => setShowRegister(true)}
+      />
+    );
+  }
+
+  // Authenticated user view
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🏦 Bank Management System</h1>
-        <p>Complete Banking Solution</p>
+        <div>
+          <h1>🏦 Bank Management System</h1>
+          <p>Complete Banking Solution</p>
+        </div>
+        <div className="user-info">
+          <span>Welcome, {currentUser?.full_name || currentUser?.username}!</span>
+          <button className="btn btn-logout" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </header>
 
       <div className="container">
