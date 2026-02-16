@@ -42,6 +42,15 @@ export const authAPI = {
     }),
 };
 
+// Application APIs
+export const applicationAPI = {
+    createApplication: (data) => api.post('/applications', data),
+    getMyApplications: () => api.get('/applications/my-applications'),
+    getAllApplications: (status) => api.get('/applications', { params: { status } }),
+    approveApplication: (id, review_notes) => api.put(`/applications/${id}/approve`, { review_notes }),
+    rejectApplication: (id, review_notes) => api.put(`/applications/${id}/reject`, { review_notes }),
+};
+
 // Set auth token for all requests
 export const setAuthToken = (token) => {
     if (token) {

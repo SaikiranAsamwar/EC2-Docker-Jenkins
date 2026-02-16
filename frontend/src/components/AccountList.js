@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function AccountList({ accounts, onEdit, onDelete, onTransaction }) {
+function AccountList({ accounts, onEdit, onDelete, onTransaction, isStaff }) {
   if (accounts.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem', color: 'white' }}>
@@ -53,18 +53,22 @@ function AccountList({ accounts, onEdit, onDelete, onTransaction }) {
             >
               💰 Transaction
             </button>
-            <button 
-              className="btn btn-info" 
-              onClick={() => onEdit(account)}
-            >
-              ✏️ Edit
-            </button>
-            <button 
-              className="btn btn-danger" 
-              onClick={() => onDelete(account.account_id)}
-            >
-              🗑️ Delete
-            </button>
+            {isStaff && onEdit && (
+              <button 
+                className="btn btn-info" 
+                onClick={() => onEdit(account)}
+              >
+                ✏️ Edit
+              </button>
+            )}
+            {isStaff && onDelete && (
+              <button 
+                className="btn btn-danger" 
+                onClick={() => onDelete(account.account_id)}
+              >
+                🗑️ Delete
+              </button>
+            )}
           </div>
         </div>
       ))}
@@ -83,9 +87,10 @@ AccountList.propTypes = {
     balance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     status: PropTypes.string
   })).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onTransaction: PropTypes.func.isRequired
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  onTransaction: PropTypes.func.isRequired,
+  isStaff: PropTypes.bool
 };
 
 export default AccountList;

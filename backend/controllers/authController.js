@@ -7,13 +7,16 @@ const JWT_EXPIRATION = '24h';
 
 // Register new user
 const register = async (req, res) => {
-    const { username, email, password, full_name } = req.body;
+    const { username, email, password, full_name, role } = req.body;
 
     try {
         // Validate input
         if (!username || !email || !password || !full_name) {
             return res.status(400).json({ error: 'All fields are required' });
         }
+
+        // Validate role
+        const userRole = role && (role === 'staff' || role === 'customer') ? role : 'customer';
 
         // Check if user already exists
         const [existingUsers] = await db.execute(
@@ -31,13 +34,13 @@ const register = async (req, res) => {
 
         // Insert user into database
         const [result] = await db.execute(
-            'INSERT INTO users (username, email, password, full_name) VALUES (?, ?, ?, ?)',
-            [username, email, hashedPassword, full_name]
+            'INSERT INTO users (username, email, password, full_name, role) VALUES (?, ?, ?, ?, ?)',
+            [username, email, hashedPassword, full_name, userRole]
         );
 
         // Generate JWT token
         const token = jwt.sign(
-            { user_id: result.insertId, username, email, role: 'user' },
+            { user_id: result.insertId, username, email, role: userRole },
             JWT_SECRET,
             { expiresIn: JWT_EXPIRATION }
         );
@@ -50,7 +53,7 @@ const register = async (req, res) => {
                 username,
                 email,
                 full_name,
-                role: 'user'
+                role: userRole
             }
         });
     } catch (error) {

@@ -8,7 +8,8 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
         email: '',
         password: '',
         confirmPassword: '',
-        full_name: ''
+        full_name: '',
+        role: 'customer'
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -95,6 +96,25 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
                             required
                             placeholder="Enter your email"
                         />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="role">Account Type</label>
+                        <select
+                            id="role"
+                            name="role"
+                            value={formData.role}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="customer">Customer Account</option>
+                            <option value="staff">Bank Staff Account</option>
+                        </select>
+                        <p className="role-description">
+                            {formData.role === 'customer' 
+                                ? '📱 Access your personal banking services' 
+                                : '👔 Manage bank operations and customer accounts'}
+                        </p>
                     </div>
 
                     <div className="form-group">

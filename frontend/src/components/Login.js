@@ -81,7 +81,8 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
 
                 <div className="demo-credentials">
                     <p><strong>Demo Credentials:</strong></p>
-                    <p>Username: admin | Password: password123</p>
+                    <p>👔 Staff: staff_admin | password123</p>
+                    <p>📱 Customer: john_customer | password123</p>
                 </div>
             </div>
         </div>
